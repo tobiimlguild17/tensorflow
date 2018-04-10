@@ -117,7 +117,7 @@ public class TensorFlowImageClassifier implements Classifier {
     // Pre-allocate buffers.
     c.outputNames = new String[] {outputName};
     c.intValues = new int[inputSize * inputSize];
-    c.floatValues = new float[inputSize * inputSize * 3];
+    c.floatValues = new float[inputSize * inputSize];
     c.outputs = new float[numClasses];
 
     return c;
@@ -134,15 +134,15 @@ public class TensorFlowImageClassifier implements Classifier {
     bitmap.getPixels(intValues, 0, bitmap.getWidth(), 0, 0, bitmap.getWidth(), bitmap.getHeight());
     for (int i = 0; i < intValues.length; ++i) {
       final int val = intValues[i];
-      floatValues[i * 3 + 0] = (((val >> 16) & 0xFF) - imageMean) / imageStd;
-      floatValues[i * 3 + 1] = (((val >> 8) & 0xFF) - imageMean) / imageStd;
-      floatValues[i * 3 + 2] = ((val & 0xFF) - imageMean) / imageStd;
+      float rgb = (((val >> 16) & 0xFF) + ((val >> 8) & 0xFF) + (val & 0xFF)) / 3.0f;
+      float inverted = 255.0f - rgb;
+      floatValues[i] = (inverted - imageMean) / imageStd;
     }
     Trace.endSection();
 
     // Copy the input data into TensorFlow.
     Trace.beginSection("feed");
-    inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 3);
+    inferenceInterface.feed(inputName, floatValues, 1, inputSize, inputSize, 1);
     Trace.endSection();
 
     // Run the inference call.
