@@ -135,8 +135,10 @@ public class TensorFlowImageClassifier implements Classifier {
     for (int i = 0; i < intValues.length; ++i) {
       final int val = intValues[i];
       float rgb = (((val >> 16) & 0xFF) + ((val >> 8) & 0xFF) + (val & 0xFF)) / 3.0f;
-      float inverted = 255.0f - rgb;
-      floatValues[i] = (inverted - imageMean) / imageStd;
+//      float inverted = 255.0f - rgb;
+//      floatValues[i] = (inverted - imageMean) / imageStd;
+//      floatValues[i] = (rgb - imageMean) / imageStd;
+      floatValues[i] = rgb;
     }
     Trace.endSection();
 
